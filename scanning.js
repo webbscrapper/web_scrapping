@@ -2,7 +2,7 @@ const puppeteer = require('puppeteer');
 require('dotenv').config;
 const express = require('express');
 const app = express();
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 8080;
 
 app.use(express.json());
 app.get('/', (req, res) => {
@@ -18,9 +18,7 @@ app.post('/v1/sendbotdata', async (req, res) => {
   console.log(req.body); // Log the request body
   const data = [];
 
-
-  try {
-    const browser = await puppeteer.launch({
+const browser = await puppeteer.launch({
       args:[
       "--disable-setuid-sandbox",
       "--no-sandbox",
@@ -32,6 +30,8 @@ app.post('/v1/sendbotdata', async (req, res) => {
       :puppeteer.executablePath(),
       headless: true,
       timeout: 0 });
+  try {
+    
     const page = await browser.newPage();
     const url = req.body.url;
     var paginurltxt;
@@ -210,6 +210,8 @@ app.post('/v1/sendbotdata', async (req, res) => {
       'error': 'Internal server error',
       'data':data,
     });
+  } finally {
+    await browser.close();
   }
 });
 
