@@ -2,13 +2,14 @@ const puppeteer = require('puppeteer');
 require('dotenv').config;
 const express = require('express');
 const app = express();
+const PORT = process.env.PORT || 4000
 
 app.use(express.json());
 app.get('/', (req, res) => {
   res.sendStatus(200);
 })
 
-app.listen(() => {
+app.listen(PORT,() => {
   console.log("Server Start Running");
 });
 
