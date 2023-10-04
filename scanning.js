@@ -4,6 +4,9 @@ const express = require('express');
 const app = express();
 
 app.use(express.json());
+app.get('/', (req, res) => {
+  res.sendStatus(200);
+})
 
 app.listen(() => {
   console.log("Server Start Running");
