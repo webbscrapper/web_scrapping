@@ -207,7 +207,7 @@ app.post('/v1/sendbotdata', async (req, res) => {
     res.status(500).json({
       'status_code': 500,
       'error': 'Internal server error',
-      'data':data,
+      'data':"no data available",
     });
   }
 });
