@@ -9,7 +9,7 @@ app.get('/', (req, res) => {
   res.status(200).json({
     "Alert":"Hello",
   });
-})
+});
 
 app.listen(PORT,() => {
   console.log("Server Start Running");
