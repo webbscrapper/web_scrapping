@@ -5,11 +5,12 @@ const app = express();
 const PORT = process.env.PORT || 8080;
 
 app.use(express.json());
+
 app.get('/', (req, res) => {
   res.status(200).json({
     "Alert":"Hello",
   });
-});
+})
 
 app.listen(PORT,() => {
   console.log("Server Start Running");
@@ -107,7 +108,14 @@ const browser = await puppeteer.launch({
       while (true) {
         const currentPageURL = url+paginurltxt+pageCounter;
         console.log(currentPageURL);
-        await page.goto(currentPageURL, { timeout: 0, waitUntil: 'domcontentloaded' });
+        try {
+             await page.goto(currentPageURL, { timeout: 0, waitUntil: 'domcontentloaded' });
+             
+            } catch (error) {
+            
+              console.error('Error navigating to page:', error);
+            
+            }
           await page.waitForTimeout(8000);
           if(req.body.imgclass == null || req.body.imgclass == ""){
             break;
@@ -207,11 +215,12 @@ const browser = await puppeteer.launch({
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({
-      'status_code': 500,
-      'error': 'Internal server error',
-      'data':data,
-    });
+    res.send("Error Occur while fetching data");
+    // res.status(500).json({
+    //   'status_code': 500,
+    //   'error': 'Internal server error',
+    //   'data':data,
+    // });
   } finally {
     await browser.close();
   }
