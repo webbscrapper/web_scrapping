@@ -109,7 +109,13 @@ const browser = await puppeteer.launch({
         const currentPageURL = url+paginurltxt+pageCounter;
         console.log(currentPageURL);
         try {
-             await page.goto(currentPageURL, { timeout: 0, waitUntil: 'domcontentloaded' });
+             try{
+               await page.goto(currentPageURL, { timeout: 0, waitUntil: 'domcontentloaded' });
+              
+             }catch(e){
+              console.log("Frame Error not working");
+              continue;
+             }
              
             } catch (error) {
             
@@ -215,12 +221,11 @@ const browser = await puppeteer.launch({
     });
   } catch (error) {
     console.error(error);
-    res.send("Error Occur while fetching data");
-    // res.status(500).json({
-    //   'status_code': 500,
-    //   'error': 'Internal server error',
-    //   'data':data,
-    // });
+    res.status(500).json({
+      'status_code': 500,
+      'error': 'Internal server error',
+      'data':data,
+    });
   } finally {
     await browser.close();
   }
