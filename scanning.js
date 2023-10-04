@@ -120,7 +120,7 @@ app.post('/v1/sendbotdata', async (req, res) => {
         break; // Exit the loop
         
       }
-      return;
+      continue;
     }
     datacount = 0;
 
