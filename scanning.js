@@ -31,11 +31,11 @@ const browser = await puppeteer.launch({
       executablePath: process.env.NODE_ENV === "production" 
       ? process.env.PUPPETEER_EXECUTABLE_PATH
       :puppeteer.executablePath(),
-      headless: true,
+      headless: false,
       timeout: 0 });
   try {
     
-    const page = await browser.newPage();
+    var page = await browser.newPage();
     const url = req.body.url;
     var paginurltxt;
     var paginurlval = req.body.paginationurlvalue;
@@ -108,6 +108,8 @@ const browser = await puppeteer.launch({
       while (true) {
         const currentPageURL = url+paginurltxt+pageCounter;
         console.log(currentPageURL);
+        await page.close();
+         page = await browser.newPage();
         try {
              try{
                await page.goto(currentPageURL, { timeout: 0, waitUntil: 'domcontentloaded' });
@@ -207,8 +209,7 @@ const browser = await puppeteer.launch({
         console.log("I run");
 
         pageCounter+=paginurlval;
-        await page.close();
-        const page = await browser.newPage();
+        
       }
     }
 
