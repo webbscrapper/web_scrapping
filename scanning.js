@@ -207,6 +207,8 @@ const browser = await puppeteer.launch({
         console.log("I run");
 
         pageCounter+=paginurlval;
+        await page.close();
+        const page = await browser.newPage();
       }
     }
 
@@ -220,6 +222,7 @@ const browser = await puppeteer.launch({
       'data': data,
     });
   } catch (error) {
+    console.log("Something is going wrong");
     console.error(error);
     res.status(500).json({
       'status_code': 500,
