@@ -39,8 +39,6 @@ const browser = await puppeteer.launch({
     const url = req.body.url;
     var paginurltxt;
     var paginurlval = req.body.paginationurlvalue;
-    var pageCounter = 1;
-    var datacount = 0;
 
 
     if (!url || typeof url !== 'string') {
@@ -104,7 +102,8 @@ const browser = await puppeteer.launch({
       }
     } else {
       // Pagination elements found, navigate through paginated pages
-      
+      let pageCounter = 1;
+      let datacount = 0;
 
       while (true) {
         const currentPageURL = url+paginurltxt+pageCounter;
