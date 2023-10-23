@@ -1492,12 +1492,20 @@ var currentPageURL = "";
 
   // ];
 // setWebsiteData();
+var count = 0;
+const dataArray = [];
+  
 getWebsiteData();
 setTimeout(getWebsiteData, 4 * 60 * 60 * 1000);
 
 
 async function getWebsiteData() {
-  const dataArray = [];
+if(count == dataArray.length){
+  count = 0;
+  dataArray.length = 0;
+}else{
+  return;
+}
   try {
     const snapshot = await db.collection("websitedata").get();
 
@@ -1519,7 +1527,7 @@ async function setWebsiteData(addingUrlData) {
 
   for (let i = 0; i < addingUrlData.length; i++) {
     // You can add any necessary logic here, similar to the Dart code.
-
+   count+=1;
     await scrapeWebsiteUrl(
       addingUrlData[i]['parentdivclass'].toString(),
       addingUrlData[i]['url'].toString(),
