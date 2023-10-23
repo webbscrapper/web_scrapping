@@ -4,6 +4,7 @@ const axios = require('axios');
 const express = require('express');
 const app = express();
 const PORT = process.env.PORT || 8080;
+<<<<<<< HEAD
 
 var admin = require("firebase-admin");
 
@@ -13,6 +14,8 @@ admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
 });
 
+=======
+>>>>>>> fa73fda788cb0786002806f6b71b3030c5549b16
 
 app.use(express.json());
 app.get('/', (req, res) => {
@@ -22,6 +25,15 @@ app.get('/', (req, res) => {
 });
 
 
+<<<<<<< HEAD
+=======
+app.get('/', (req, res) => {
+  res.status(200).json({
+    "Alert":"Hello",
+  });
+})
+
+>>>>>>> fa73fda788cb0786002806f6b71b3030c5549b16
 app.listen(PORT,() => {
   console.log("Server Start Running");
 });
@@ -1506,6 +1518,7 @@ async function getWebsiteData() {
       dataArray.push(data);
     });
 
+<<<<<<< HEAD
     console.log(dataArray); // This will print the array with your Firestore collection data
 
     // Assuming setWebsiteData is an asynchronous function
@@ -1551,6 +1564,11 @@ async function setWebsiteData(addingUrlData) {
 async function scrapeWebsiteUrl(parentdivclass,urls,imgclass,descpclass,currclass,priceclass,paginationpageclass,paginationurltxt,paginationurlvalue) {
    console.log('Received a POST request to /v1/sendbotdata');
   // console.log(req.body); // Log the request body
+=======
+app.post('/v1/sendbotdata', async (req, res) => {
+  console.log('Received a POST request to /v1/sendbotdata');
+  console.log(req.body); // Log the request body
+>>>>>>> fa73fda788cb0786002806f6b71b3030c5549b16
   const data = [];
 
 const browser = await puppeteer.launch({
@@ -1568,7 +1586,11 @@ const browser = await puppeteer.launch({
   try {
     
     var page = await browser.newPage();
+<<<<<<< HEAD
     const url = urls;
+=======
+    const url = req.body.url;
+>>>>>>> fa73fda788cb0786002806f6b71b3030c5549b16
     var paginurltxt;
     var paginurlval = paginationurlvalue;
 
@@ -1888,12 +1910,20 @@ for (const parentElement of parentElements) {
   } catch (error) {
     console.log("Something is going wrong");
     console.error(error);
+<<<<<<< HEAD
     await SaveProducts(data,currentPageURL);
     // res.status(500).json({
     //   'status_code': 500,
     //   'error': 'Internal server error',
     //   'data':data,
     // });
+=======
+    res.status(500).json({
+      'status_code': 500,
+      'error': 'Internal server error',
+      'data':data,
+    });
+>>>>>>> fa73fda788cb0786002806f6b71b3030c5549b16
   } finally {
     await browser.close();
   }
@@ -2172,6 +2202,34 @@ async function sendMessageToDiscord(dataList, websiteurl) {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // const puppeteer = require('puppeteer');
 // require('dotenv').config;
 // const express = require('express');
@@ -2296,6 +2354,7 @@ async function sendMessageToDiscord(dataList, websiteurl) {
 
 
 //     const imgElem = await page.waitForSelector(imgSelector); // Adjust the timeout as needed
+<<<<<<< HEAD
 
 //     if (!imgElem) {
 //       console.log('Image selector not found on the next page. Stopping program.');
@@ -2359,6 +2418,71 @@ async function sendMessageToDiscord(dataList, websiteurl) {
 //         }
 //         console.log("I run");
 
+=======
+
+//     if (!imgElem) {
+//       console.log('Image selector not found on the next page. Stopping program.');
+//       break; // Exit the loop
+//     }
+
+//     // Add an event listener to the <img> element to check for the 'load' event
+//     await page.evaluate((selector) => {
+//       const imgElement = document.querySelector(selector);
+//        new Promise((resolve) => {
+//         imgElement.addEventListener('load', resolve);
+//       });
+//     }, imgSelector);
+//          // await page.waitForSelector(req.body.imgclass);
+//          await page.evaluate(() => {
+//            window.scrollTo(0, document.body.scrollHeight);
+//          });
+
+
+//         // Your scraping logic here
+//         const imageUrls = await page.$$eval(req.body.imgclass, images => {
+//           return images.map(img => img.src);
+//         });
+
+//         const descp = await page.$$(req.body.descpclass);
+//         const curr = await page.$$(req.body.currclass);
+//         const elements = await page.$$(req.body.priceclass);
+//         const nextpage = await page.$$(req.body.priceclass);
+
+//         for (let i = 0; i < imageUrls.length; i++) {
+//           const imageUrl = imageUrls[i];
+//           const description = descp[i];
+//           const priceElement = elements[i];
+//           const currencyElement = curr[i];
+
+//           if (!priceElement || !currencyElement || !description) {
+//             console.log(`Skipping index ${i} due to missing elements.`);
+//             continue;
+//           }
+
+//           const priceProperty = await priceElement.getProperty('textContent');
+//           const currencyProperty = await currencyElement.getProperty('textContent');
+//           const descriptionProperty = await description.getProperty('textContent');
+
+//           const desc = await descriptionProperty.jsonValue();
+//           const price = await priceProperty.jsonValue();
+//           const currency = await currencyProperty.jsonValue();
+
+//           data.push({
+//             'description': desc,
+//             'imageurl': imageUrl,
+//             'price': price,
+//             'currency': currency
+//           });
+//         }
+
+//         // Check if there are no more pages to scrape
+//         const hasNextPage = await page.$(req.body.paginationpageclass);
+//         if (!hasNextPage || hasNextPage == "" || hasNextPage == null || imageUrls.length == 0 ) {
+//           break;
+//         }
+//         console.log("I run");
+
+>>>>>>> fa73fda788cb0786002806f6b71b3030c5549b16
 //         pageCounter+=paginurlval;
 //       }
 //     }
