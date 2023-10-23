@@ -1773,7 +1773,7 @@ for (const parentElement of parentElements) {
       //       'currency': priceText,
       //       'websiteurl':currentPageURL
       //     });
-      consloe.log("Data Pushed");
+      console.log("Data Pushed");
 
           data.push({
             'description': descText,
@@ -1797,7 +1797,7 @@ for (const parentElement of parentElements) {
           //   'currency': priceText,
           //   'websiteurl':currentPageURL
           // });
-          consloe.log("Data Pushed");
+          console.log("Data Pushed");
 
           data.push({
             'description': descText,
