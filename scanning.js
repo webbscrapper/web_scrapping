@@ -1930,7 +1930,7 @@ async function SaveProducts(productData, websiteurl) {
         productdescp: productData[i].description,
         oldprice: productData[i].price.toString(),
         oldpricedate: new Date(),
-        newprice: '$0',
+        newprice: productData[i].price.toString(),
         newpricedate: new Date(),
         productcurrency: productData[i].currency,
         websiteurl: productData[i].websiteurl,
