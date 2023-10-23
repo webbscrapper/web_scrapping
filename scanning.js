@@ -1750,8 +1750,10 @@ for (const parentElement of parentElements) {
   const descElements = await parentElement.$$(descpclass);
   const imageElements = await parentElement.$$(imgclass);
   const priceElements = await parentElement.$$(priceclass);
-   console.log("Descp: "+descElements.length);
-    console.log("Price: "+priceElements.length);
+   
+   console.log("Descp Length: "+descElements.length);
+   console.log("Image Length: "+imageElements.length);
+   console.log("Price Length: "+priceElements.length);
  
   // console.log("Image Details:"+imageElements.toString());
   // console.log("Length of Desc:"+descElements.length.toString() );
@@ -1764,13 +1766,14 @@ for (const parentElement of parentElements) {
     const imageUrl = await imageElements[0].evaluate(element => element.getAttribute('src'));
     const priceText = await priceElements[0].evaluate(element => element.textContent);
 
-      console.log({
-            'description': descText,
-            'imageurl': imageUrl,
-            'price': priceText,
-            'currency': priceText,
-            'websiteurl':currentPageURL
-          });
+      // console.log({
+      //       'description': descText,
+      //       'imageurl': imageUrl,
+      //       'price': priceText,
+      //       'currency': priceText,
+      //       'websiteurl':currentPageURL
+      //     });
+      consloe.log("Data Pushed");
 
           data.push({
             'description': descText,
@@ -1787,13 +1790,14 @@ for (const parentElement of parentElements) {
       const imageUrl = "no image";
       const priceText = await priceElements[0].evaluate(element => element.textContent);
           
-          console.log({
-            'description': descText,
-            'imageurl': imageUrl,
-            'price': priceText,
-            'currency': priceText,
-            'websiteurl':currentPageURL
-          });
+          // console.log({
+          //   'description': descText,
+          //   'imageurl': imageUrl,
+          //   'price': priceText,
+          //   'currency': priceText,
+          //   'websiteurl':currentPageURL
+          // });
+          consloe.log("Data Pushed");
 
           data.push({
             'description': descText,
