@@ -1494,6 +1494,7 @@ var currentPageURL = "";
 // setWebsiteData();
 var count = 0;
 const dataArray = [];
+var countDiscountMessage = 0;
   
 getWebsiteData();
 setTimeout(getWebsiteData, 4 * 60 * 60 * 1000);
@@ -1504,6 +1505,8 @@ if(count == dataArray.length){
   count = 0;
   dataArray.length = 0;
 }else{
+  count = 0;
+  dataArray.length = 0;
   return;
 }
   try {
@@ -2069,19 +2072,21 @@ async function SaveProducts(productData, websiteurl) {
       }
     }
 
-    if (sendDataInEmail.length >= 10) {
+    if (sendDataInEmail.length >= 15) {
       console.log('Send Data Length Is High');
       // Call your email sending function or Discord message sending function here.
       // await sendEmail(sendDataInEmail, websiteurl);
+       countDiscountMessage = 0;
       await sendMessageToDiscord(sendDataInEmail, websiteurl);
       sendDataInEmail.length = 0;
     }
   }
 
-  if (sendDataInEmail.length > 0 && sendDataInEmail.length < 10) {
+  if (sendDataInEmail.length > 0 && sendDataInEmail.length < 15) {
     console.log('Send Data Length Is High');
     // Call your email sending function or Discord message sending function here.
     // await sendEmail(sendDataInEmail, websiteurl);
+     countDiscountMessage = 0;
     await sendMessageToDiscord(sendDataInEmail, websiteurl);
     sendDataInEmail.length = 0;
   }
@@ -2119,8 +2124,8 @@ async function sendMessageToDiscord(dataList, websiteurl) {
     embeds,
   };
 
-  try {
-    const response = await axios.post(apiUrl, messageData, { headers });
+   try {
+    const response = await axios.post(API_URL, messageData, { headers });
 
     if (response.status === 200) {
       console.log('Embed message with product information sent successfully.');
@@ -2130,8 +2135,18 @@ async function sendMessageToDiscord(dataList, websiteurl) {
       // Handle the error case.
     }
   } catch (error) {
-    console.error('Failed to send embed message:', error);
-    // Handle any exceptions that may occur during the request.
+    if (error.response && error.response.status === 429 && countDiscountMessage == 0) {
+      // Rate limit exceeded, implement exponential backoff.
+       countDiscountMessage = 1;
+      const retryAfter = error.response.headers['Retry-After'] || 1000; // Default to 1 second if no Retry-After header.
+      console.log(`Rate limit exceeded. Retrying in ${retryAfter} ms.`);
+      await new Promise(resolve => setTimeout(resolve, retryAfter));
+      // Retry the request.
+      return sendMessageToDiscord(dataList, websiteurl);
+    } else {
+      console.error('Failed to send embed message:', error);
+      // Handle other exceptions that may occur during the request.
+    }
   }
 }
 
