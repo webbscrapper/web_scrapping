@@ -1965,43 +1965,7 @@ async function SaveProducts(productData, websiteurl) {
 
       console.log('Product Description is: ' + snapshot.docs[0].data().productdescp);
 
-      if (
-        snapshot.docs[0].data().productdescp === productData[i].description &&
-        oldprice === price
-      ) {
-        if (snapshot.docs[0].data().newprice !== '$0') {
-          console.log('Old price not changed but changing data');
-
-          discountprice = newprice - price;
-          if (discountprice < 0) {
-            discountprice = -discountprice;
-          }
-
-          discountpercent = (discountprice / newprice) * 100;
-          console.log('Id of Product: ' + snapshot.docs[0].id);
-
-          await db.collection('products').doc(snapshot.docs[0].id).update({
-            imageurl:productData[i].imageurl,
-            oldprice: snapshot.docs[0].data().newprice.toString(),
-            oldpricedate: snapshot.docs[0].data().newpricedate.toDate(),
-            newprice: productData[i].price.toString(),
-            newpricedate: new Date(),
-            dicountpercentage: discountpercent,
-          });
-
-          // sendDataInEmail.push({
-          //   image: productData[i].imageurl,
-          //   description: productData[i].description,
-          //   oldprice: snapshot.docs[0].data().newprice,
-          //   oldpricedate: snapshot.docs[0].data().newpricedate.toDate(),
-          //   newprice: productData[i].price,
-          //   newpricedate: new Date(),
-          //   dicountpercentage: discountpercent,
-          //   websiteurl: productData[i].websiteurl,
-          // });
-        }
-      }else if (
-        snapshot.docs[0].data().productdescp === productData[i].description &&
+        if (snapshot.docs[0].data().productdescp === productData[i].description &&
         newprice !== 0 &&
         newprice !== price
       ) {
