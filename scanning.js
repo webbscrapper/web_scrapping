@@ -2125,7 +2125,7 @@ async function sendMessageToDiscord(dataList, websiteurl) {
   };
 
    try {
-    const response = await axios.post(API_URL, messageData, { headers });
+     const response = await axios.post(apiUrl, messageData, { headers });
 
     if (response.status === 200) {
       console.log('Embed message with product information sent successfully.');
