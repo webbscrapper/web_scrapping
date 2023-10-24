@@ -1989,16 +1989,16 @@ async function SaveProducts(productData, websiteurl) {
             dicountpercentage: discountpercent,
           });
 
-          sendDataInEmail.push({
-            image: productData[i].imageurl,
-            description: productData[i].description,
-            oldprice: snapshot.docs[0].data().newprice,
-            oldpricedate: snapshot.docs[0].data().newpricedate.toDate(),
-            newprice: productData[i].price,
-            newpricedate: new Date(),
-            dicountpercentage: discountpercent,
-            websiteurl: productData[i].websiteurl,
-          });
+          // sendDataInEmail.push({
+          //   image: productData[i].imageurl,
+          //   description: productData[i].description,
+          //   oldprice: snapshot.docs[0].data().newprice,
+          //   oldpricedate: snapshot.docs[0].data().newpricedate.toDate(),
+          //   newprice: productData[i].price,
+          //   newpricedate: new Date(),
+          //   dicountpercentage: discountpercent,
+          //   websiteurl: productData[i].websiteurl,
+          // });
         }
       } else if (
         snapshot.docs[0].data().productdescp === productData[i].description &&
