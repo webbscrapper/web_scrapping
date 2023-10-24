@@ -1922,7 +1922,7 @@ async function SaveProducts(productData, websiteurl) {
   let price = 0.0;
   let discountpercent = 0.0;
 
-  console.log('Product Data: ' + JSON.stringify(productData));
+  // console.log('Product Data: ' + JSON.stringify(productData));
   console.log('Save product data length: ' + productData.length.toString());
 
   for (let i = 0; i < productData.length; i++) {
