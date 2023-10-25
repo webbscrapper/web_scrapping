@@ -1714,8 +1714,11 @@ const browser = await puppeteer.launch({
     const imgElem = await page.waitForSelector(imgSelector); // Adjust the timeout as needed
 
     if (!imgElem) {
-      console.log('Image selector not found on the next page. Stopping program.');
-      break; // Exit the loop
+      await page.waitForTimeout(8000); 
+      if (!imgElem) {
+        console.log('Data not found on the next page. Stopping program.');
+        break; // Exit the loop
+      } 
     }
 
     // Add an event listener to the <img> element to check for the 'load' event
