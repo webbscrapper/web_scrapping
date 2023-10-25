@@ -1495,7 +1495,7 @@ var currentPageURL = "";
 var count = 0;
 const dataArray = [];
 var countDiscountMessage = 0;
-  
+var codToke  = ""; 
 getWebsiteData();
 setInterval(getWebsiteData, 4 * 60 * 60 * 1000);
 
@@ -1509,6 +1509,25 @@ if(count == dataArray.length){
   // dataArray.length = 0;
   return;
 }
+
+try {
+    const snapshott = await db.collection("tokens").get();
+
+    // snapshott.forEach((doc) => {
+      const tokendata = snapshott.docs[0].data();
+      codToke = tokendata['token'];
+
+      // dataArray.push(data);
+    // });
+
+    // console.log(dataArray); // This will print the array with your Firestore collection data
+
+    // Assuming setWebsiteData is an asynchronous function
+    // await setWebsiteData(dataArray);
+  } catch (error) {
+    console.error('Error getting documents:', error);
+  }
+
   try {
     const snapshot = await db.collection("websitedata").get();
 
@@ -2009,7 +2028,7 @@ async function SaveProducts(productData, websiteurl) {
           discountprice = -discountprice;
         }
 
-        discountpercent = Math.floor((discountprice / newprice) * 100);
+        discountpercent = parseInt((discountprice / newprice) * 100);
         console.log('Id of Product: ' + snapshot.docs[0].id);
 
         await db.collection('products').doc(snapshot.docs[0].id).update({
@@ -2062,7 +2081,7 @@ async function SaveProducts(productData, websiteurl) {
 
 async function sendMessageToDiscord(dataList, websiteurl) {
   // const botToken = 'MTE2MTE4NzQ3MDIxODYyNTEyNQ.GgtfQA.J95Jzy-RSq05hiYJIA4mfOQ11HDZ0Z5JJT3Jdc';
-  const botToken = 'MTE2NDk3NzA2Mzc1MzY5OTM2OA.GW0CHX.vRb-WGr5n4REiXp92SPi_CX0y1arHi50yWrI6c';
+  const botToken = codToke;
   const channelId = '1164216355382382644';
   const apiUrl = `https://discord.com/api/v10/channels/${channelId}/messages`;
 
