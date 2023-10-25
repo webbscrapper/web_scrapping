@@ -1529,10 +1529,12 @@ async function setWebsiteData(addingUrlData) {
   console.log("Added Data Displayed:" + addingUrlData[0]['url'].toString());
 
   for (let i = 0; i < addingUrlData.length; i++) {
+
     // You can add any necessary logic here, similar to the Dart code.
    count+=1;
     await scrapeWebsiteUrl(
       addingUrlData[i]['parentdivclass'].toString(),
+      addingUrlData[i]['producturlclass'].toString(),
       addingUrlData[i]['url'].toString(),
       addingUrlData[i]['imgclass'].toString(),
       addingUrlData[i]['descpclass'].toString(),
@@ -1559,7 +1561,7 @@ async function setWebsiteData(addingUrlData) {
 //   });
 
 // Add a new document with a generated ID to a collection
-async function scrapeWebsiteUrl(parentdivclass,urls,imgclass,descpclass,currclass,priceclass,paginationpageclass,paginationurltxt,paginationurlvalue) {
+async function scrapeWebsiteUrl(parentdivclass,producturlclass,urls,imgclass,descpclass,currclass,priceclass,paginationpageclass,paginationurltxt,paginationurlvalue) {
    console.log('Received a POST request to /v1/sendbotdata');
   // console.log(req.body); // Log the request body
   const data = [];
@@ -1607,7 +1609,7 @@ const browser = await puppeteer.launch({
     }
     // const paginationElements = await page.$$(req.body.paginationclass);
 
-    if (paginationpageclass =="") {
+    if (paginationpageclass == "") {
       // No pagination elements found, scrape data from a single page
       const imageUrls = await page.$$eval(imgclass, images => {
         return images.map(img => img.src);
@@ -1649,7 +1651,9 @@ const browser = await puppeteer.launch({
       let pageCounter = 1;
       let datacount = 0;
 
+
       while (true) {
+        
         currentPageURL = url+paginurltxt+pageCounter;
         console.log(currentPageURL);
         await page.close();
@@ -1756,15 +1760,18 @@ console.log("Parent Element Length: "+parentElements.length.toString());
 var desc = [];
 var imageUrls = [];
 var price = [];
-
+var prodUrl = "";
 for (const parentElement of parentElements) {
   const descElements = await parentElement.$$(descpclass);
   const imageElements = await parentElement.$$(imgclass);
   const priceElements = await parentElement.$$(priceclass);
+  const productElements = await parentElement.$$(producturlclass);
    
    console.log("Descp Length: "+descElements.length);
+   console.log("Product Length: "+productElements.length);
    console.log("Image Length: "+imageElements.length);
    console.log("Price Length: "+priceElements.length);
+   console.log("Peoduct Url Class: "+producturlclass);
  
   // console.log("Image Details:"+imageElements.toString());
   // console.log("Length of Desc:"+descElements.length.toString() );
@@ -1772,8 +1779,15 @@ for (const parentElement of parentElements) {
   // console.log("Length of Price:"+priceElements.length.toString() );
  
     
-  if (descElements.length > 0 && imageElements.length > 0 && priceElements.length > 0) {
+  if (descElements.length > 0 && imageElements.length > 0 && priceElements.length > 0 ) {
     const descText = await descElements[0].evaluate(element => element.textContent);
+    if(productElements.length >0){
+        prodUrl = await productElements[0].evaluate(element => element.getAttribute('href'));
+        
+      }else{
+          prodUrl = "no product url";
+        
+      }
     const imageUrl = await imageElements[0].evaluate(element => element.getAttribute('src'));
     const priceText = await priceElements[0].evaluate(element => element.textContent);
 
@@ -1788,6 +1802,7 @@ for (const parentElement of parentElements) {
 
           data.push({
             'description': descText,
+            'producturl':prodUrl,
             'imageurl': imageUrl,
             'price': priceText,
             'currency': priceText,
@@ -1795,9 +1810,16 @@ for (const parentElement of parentElements) {
           });
   } else {
 
-    if(descElements.length > 0 && priceElements.length > 0){
+    if(descElements.length > 0 && priceElements.length > 0 ){
 
       const descText = await descElements[0].evaluate(element => element.textContent);
+      if(productElements.length >0){
+        prodUrl = await productElements[0].evaluate(element => element.getAttribute('href'));
+        
+      }else{
+          prodUrl = "no product url";
+        
+      }
       const imageUrl = "no image";
       const priceText = await priceElements[0].evaluate(element => element.textContent);
           
@@ -1812,6 +1834,7 @@ for (const parentElement of parentElements) {
 
           data.push({
             'description': descText,
+            'producturl':prodUrl,
             'imageurl': imageUrl,
             'price': priceText,
             'currency': priceText,
@@ -1920,7 +1943,15 @@ async function SaveProducts(productData, websiteurl) {
   let newprice = 0.0;
   let oldprice = 0.0;
   let price = 0.0;
-  let discountpercent = 0.0;
+  let discountpercent = 0;
+  const dateFormatter = new Intl.DateTimeFormat('en-US', {
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+  second: '2-digit',
+});
 
   // console.log('Product Data: ' + JSON.stringify(productData));
   console.log('Save product data length: ' + productData.length.toString());
@@ -1942,6 +1973,7 @@ async function SaveProducts(productData, websiteurl) {
       const newProductRef = await db.collection('products').add({
         imageurl:productData[i].imageurl,
         productdescp: productData[i].description,
+        producturl:productData[i].producturl,
         oldprice: productData[i].price.toString(),
         oldpricedate: new Date(),
         newprice: productData[i].price.toString(),
@@ -1967,8 +1999,7 @@ async function SaveProducts(productData, websiteurl) {
       oldprice = matchOldPrice ? parseFloat(matchOldPrice[0]) : 0.0;
 
       console.log('Product Description is: ' + snapshot.docs[0].data().productdescp);
-
-        if (snapshot.docs[0].data().productdescp === productData[i].description &&
+      if (snapshot.docs[0].data().productdescp === productData[i].description &&
         newprice !== 0 &&
         newprice !== price
       ) {
@@ -1978,7 +2009,7 @@ async function SaveProducts(productData, websiteurl) {
           discountprice = -discountprice;
         }
 
-        discountpercent = (discountprice / newprice) * 100;
+        discountpercent = Math.floor((discountprice / newprice) * 100);
         console.log('Id of Product: ' + snapshot.docs[0].id);
 
         await db.collection('products').doc(snapshot.docs[0].id).update({
@@ -1993,10 +2024,11 @@ async function SaveProducts(productData, websiteurl) {
             sendDataInEmail.push({
               image: productData[i].imageurl,
               description: productData[i].description,
+              producturl:productData[i].producturl,
               oldprice: snapshot.docs[0].data().newprice,
-              oldpricedate: snapshot.docs[0].data().newpricedate.toDate(),
+              oldpricedate:dateFormatter.format(snapshot.docs[0].data().newpricedate.toDate()),
               newprice: productData[i].price,
-              newpricedate: new Date(),
+              newpricedate:dateFormatter.format(new Date()),
               dicountpercentage: discountpercent,
               websiteurl: productData[i].websiteurl,
             });  
@@ -2030,7 +2062,7 @@ async function SaveProducts(productData, websiteurl) {
 
 async function sendMessageToDiscord(dataList, websiteurl) {
   // const botToken = 'MTE2MTE4NzQ3MDIxODYyNTEyNQ.GgtfQA.J95Jzy-RSq05hiYJIA4mfOQ11HDZ0Z5JJT3Jdc';
-  const botToken = 'MTE2NDk3NzA2Mzc1MzY5OTM2OA.GOfnLg.EysHw6zdbEOVGr8yPgSkMyWSlO21ifBGC9RN6k';
+  const botToken = 'MTE2NDk3NzA2Mzc1MzY5OTM2OA.GW0CHX.vRb-WGr5n4REiXp92SPi_CX0y1arHi50yWrI6c';
   const channelId = '1164216355382382644';
   const apiUrl = `https://discord.com/api/v10/channels/${channelId}/messages`;
 
@@ -2041,17 +2073,30 @@ async function sendMessageToDiscord(dataList, websiteurl) {
   };
 
   const embeds = [];
-
+  var embed = [];
   for (const data of dataList) {
-    const embed = {
+     if(data.image == "no image" || data.image == null || data.image == ""){
+      embed = {
       title: data.description,
       description: `- New Price: ${data.newprice}\n`
         + `- New Price Date: ${data.newpricedate}\n`
         + `- Old Price: ${data.oldprice}\n`
         + `- Old Price Date: ${data.oldpricedate}\n`
-        + `- Discount Percentage: ${data.dicountpercentage}%\n\nWebsite URL: ${data.websiteurl}`,
+        + `- Discount Percentage: ${data.dicountpercentage}%\n\nCategory URL: ${data.websiteurl}\n\nProduct URL: ${data.producturl}`,
+      // image: { url: data.image },
+    };
+
+     }else{
+      embed = {
+      title: data.description,
+      description: `- New Price: ${data.newprice}\n`
+        + `- New Price Date: ${data.newpricedate}\n`
+        + `- Old Price: ${data.oldprice}\n`
+        + `- Old Price Date: ${data.oldpricedate}\n`
+        + `- Discount Percentage: ${data.dicountpercentage}%\n\nCategory URL: ${data.websiteurl}\n\nProduct URL: ${data.producturl}`,
       image: { url: data.image },
     };
+     }
 
     embeds.push(embed);
   }
