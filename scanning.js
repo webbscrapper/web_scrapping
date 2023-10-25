@@ -1975,6 +1975,23 @@ async function SaveProducts(productData, websiteurl) {
   second: '2-digit',
 });
 
+try {
+    const snapshott = await db.collection("tokens").get();
+
+    // snapshott.forEach((doc) => {
+      const tokendata = snapshott.docs[0].data();
+      codToke = tokendata['token'];
+
+      // dataArray.push(data);
+    // });
+
+    // console.log(dataArray); // This will print the array with your Firestore collection data
+
+    // Assuming setWebsiteData is an asynchronous function
+    // await setWebsiteData(dataArray);
+  } catch (error) {
+    console.error('Error getting token:', error);
+  }
   // console.log('Product Data: ' + JSON.stringify(productData));
   console.log('Save product data length: ' + productData.length.toString());
 
