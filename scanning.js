@@ -1497,7 +1497,7 @@ const dataArray = [];
 var countDiscountMessage = 0;
   
 getWebsiteData();
-setTimeout(getWebsiteData, 4 * 60 * 60 * 1000);
+setInterval(getWebsiteData, 4 * 60 * 60 * 1000);
 
 
 async function getWebsiteData() {
@@ -1505,8 +1505,8 @@ if(count == dataArray.length){
   count = 0;
   dataArray.length = 0;
 }else{
-  count = 0;
-  dataArray.length = 0;
+  // count = 0;
+  // dataArray.length = 0;
   return;
 }
   try {
@@ -1927,6 +1927,9 @@ async function SaveProducts(productData, websiteurl) {
 
   for (let i = 0; i < productData.length; i++) {
     console.log('Firestore Index: ' + i);
+    setTimeout(() => {
+    
+    }, 2000);
 
     const snapshot = await db.collection('products')
       .where('productdescp', '==', productData[i].description)
