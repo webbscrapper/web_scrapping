@@ -1936,7 +1936,6 @@ for (const parentElement of parentElements) {
       }
     }
 
-    console.log(data);
 
     await page.close(); // Close the page
     await browser.close();
