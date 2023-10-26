@@ -2058,7 +2058,7 @@ try {
           dicountpercentage: discountpercent,
 
         });
-        if(discountpercent >= 30 && price > 50){
+        if(discountpercent >= 30 && price > 50 && newprice < price){
             sendDataInEmail.push({
               image: productData[i].imageurl,
               description: productData[i].description,
