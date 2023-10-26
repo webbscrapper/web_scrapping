@@ -1496,6 +1496,8 @@ var count = 0;
 const dataArray = [];
 var countDiscountMessage = 0;
 var codToke  = ""; 
+var discountpercent  = 0;
+var minprice  = 0; 
 getWebsiteData();
 setInterval(getWebsiteData, 4 * 60 * 60 * 1000);
 
@@ -1516,7 +1518,8 @@ try {
     // snapshott.forEach((doc) => {
       const tokendata = snapshott.docs[0].data();
       codToke = tokendata['token'];
-
+      minprice = tokendata['minprice'];
+      discountpercentagee = tokendata['discountpercentage'];
       // dataArray.push(data);
     // });
 
@@ -1964,7 +1967,7 @@ async function SaveProducts(productData, websiteurl) {
   let newprice = 0.0;
   let oldprice = 0.0;
   let price = 0.0;
-  let discountpercent = 0;
+  let discountpercentagee = 0;
   const dateFormatter = new Intl.DateTimeFormat('en-US', {
   year: 'numeric',
   month: '2-digit',
@@ -1980,6 +1983,8 @@ try {
     // snapshott.forEach((doc) => {
       const tokendata = snapshott.docs[0].data();
       codToke = tokendata['token'];
+      minprice = tokendata['minprice'];
+      discountpercentagee = tokendata['discountpercentage'];
 
       // dataArray.push(data);
     // });
@@ -2043,9 +2048,9 @@ try {
       ) {
         console.log('New Price changed');
         discountprice = newprice - price;
-        if (discountprice < 0) {
-          discountprice = -discountprice;
-        }
+        // if (discountprice < 0) {
+        //   discountprice = -discountprice;
+        // }
 
         discountpercent = parseInt((discountprice / newprice) * 100);
         console.log('Id of Product: ' + snapshot.docs[0].id);
@@ -2058,7 +2063,7 @@ try {
           dicountpercentage: discountpercent,
 
         });
-        if(discountpercent >= 30 && price > 50 && newprice < price){
+        if(discountpercent >= discountpercentagee && price > minprice ){
             sendDataInEmail.push({
               image: productData[i].imageurl,
               description: productData[i].description,
