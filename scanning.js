@@ -1496,8 +1496,9 @@ var count = 0;
 const dataArray = [];
 var countDiscountMessage = 0;
 var codToke  = ""; 
-var discountpercent  = 0;
+
 var minprice  = 0; 
+let discountpercentagee = 0;
 getWebsiteData();
 setInterval(getWebsiteData, 4 * 60 * 60 * 1000);
 
@@ -1967,7 +1968,8 @@ async function SaveProducts(productData, websiteurl) {
   let newprice = 0.0;
   let oldprice = 0.0;
   let price = 0.0;
-  let discountpercentagee = 0;
+  var discountpercent  = 0;
+  
   const dateFormatter = new Intl.DateTimeFormat('en-US', {
   year: 'numeric',
   month: '2-digit',
