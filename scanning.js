@@ -29,6 +29,7 @@ app.listen(PORT,() => {
 const sendDataInEmail = [];
 const db = admin.firestore();
 var currentPageURL = "";
+var realUrl = "";
 
 
 // const addingUrlData = [
@@ -1550,9 +1551,10 @@ try {
 }
 async function setWebsiteData(addingUrlData) {
   console.log("Added Data Displayed:" + addingUrlData[0]['url'].toString());
+  realUrl = addingUrlData[0]['url'].toString();
 
   for (let i = 0; i < addingUrlData.length; i++) {
-
+   realUrl = addingUrlData[i]['url'].toString();
     // You can add any necessary logic here, similar to the Dart code.
    count+=1;
     await scrapeWebsiteUrl(
@@ -1809,6 +1811,11 @@ for (const parentElement of parentElements) {
     const descText = await descElements[0].evaluate(element => element.textContent);
     if(productElements.length >0){
         prodUrl = await productElements[0].evaluate(element => element.getAttribute('href'));
+        if(prodUrl.includes("https")){
+
+        }else{
+          prodUrl = realUrl+prodUrl;
+        }
         
       }else{
           prodUrl = "no product url";
@@ -2066,6 +2073,7 @@ try {
 
         });
         if(discountpercent >= discountpercentagee && price > minprice ){
+
             sendDataInEmail.push({
               image: productData[i].imageurl,
               description: productData[i].description,
