@@ -1977,7 +1977,9 @@ async function SaveProducts(productData, websiteurl) {
   let price = 0.0;
   var discountpercent  = 0;
   
-  var dateFormatter = DateFormat('dd/MM/yy HH:mm:ss');
+  const { format } = require('date-fns');
+
+const formattedDate = format(date, 'dd/MM/yy HH:mm:ss');
 try {
     const snapshott = await db.collection("tokens").get();
 
@@ -2066,15 +2068,15 @@ try {
 
         });
         if(discountpercent >= discountpercentagee && price > minprice ){
-
+         
             sendDataInEmail.push({
               image: productData[i].imageurl,
               description: productData[i].description,
               producturl:productData[i].producturl,
               oldprice: snapshot.docs[0].data().newprice,
-              oldpricedate:dateFormatter.format(snapshot.docs[0].data().newpricedate.toDate()),
+              oldpricedate:formatDateTime(snapshot.docs[0].data().newpricedate.toDate()),
               newprice: productData[i].price,
-              newpricedate:dateFormatter.format(new Date()),
+              newpricedate:formatDateTime(new Date()),
               dicountpercentage: discountpercent,
               websiteurl: productData[i].websiteurl,
             });  
@@ -2109,7 +2111,17 @@ try {
     sendDataInEmail.length = 0;
   }
 }
+function formatDateTime(date) {
+  const d = date.getDate().toString().padStart(2, '0');
+  const m = (date.getMonth() + 1).toString().padStart(2, '0');
+  const y = date.getFullYear().toString().slice(-2);
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  const h = date.getHours().toString().padStart(2, '0');
+  const min = date.getMinutes().toString().padStart(2, '0');
+  const sec = date.getSeconds().toString().padStart(2, '0');
 
+  return `${d}/${m}/${y} ${hr}:${min}:${sec} ${ampm}`;
+}
 async function sendMessageToDiscord(dataList, websiteurl) {
   // const botToken = 'MTE2MTE4NzQ3MDIxODYyNTEyNQ.GgtfQA.J95Jzy-RSq05hiYJIA4mfOQ11HDZ0Z5JJT3Jdc';
   const botToken = codToke;
