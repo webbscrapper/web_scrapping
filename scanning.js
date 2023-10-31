@@ -1977,15 +1977,7 @@ async function SaveProducts(productData, websiteurl) {
   let price = 0.0;
   var discountpercent  = 0;
   
-  const dateFormatter = new Intl.DateTimeFormat('en-US', {
-  year: 'numeric',
-  month: '2-digit',
-  day: '2-digit',
-  hour: '2-digit',
-  minute: '2-digit',
-  second: '2-digit',
-});
-
+  var dateFormatter = DateFormat('dd/MM/yy HH:mm:ss');
 try {
     const snapshott = await db.collection("tokens").get();
 
@@ -2014,6 +2006,7 @@ try {
     
     }, 2000);
 
+   try{
     const snapshot = await db.collection('products')
       .where('productdescp', '==', productData[i].description)
       .get();
@@ -2101,6 +2094,10 @@ try {
       await sendMessageToDiscord(sendDataInEmail, websiteurl);
       sendDataInEmail.length = 0;
     }
+  }catch (error) {
+    console.error('Error From Firestore:', error);
+  }
+  
   }
 
   if (sendDataInEmail.length > 0 && sendDataInEmail.length < 15) {
@@ -2135,7 +2132,7 @@ async function sendMessageToDiscord(dataList, websiteurl) {
         + `- New Price Date: ${data.newpricedate}\n`
         + `- Old Price: ${data.oldprice}\n`
         + `- Old Price Date: ${data.oldpricedate}\n`
-        + `- Discount Percentage: ${data.dicountpercentage}%\n\nCategory URL: ${data.websiteurl}\n\nProduct URL: ${data.producturl}`,
+        + `- Discount Percentage: ${data.dicountpercentage}%\n\nProduct URL: ${data.producturl}`,
       // image: { url: data.image },
     };
 
@@ -2146,7 +2143,7 @@ async function sendMessageToDiscord(dataList, websiteurl) {
         + `- New Price Date: ${data.newpricedate}\n`
         + `- Old Price: ${data.oldprice}\n`
         + `- Old Price Date: ${data.oldpricedate}\n`
-        + `- Discount Percentage: ${data.dicountpercentage}%\n\nCategory URL: ${data.websiteurl}\n\nProduct URL: ${data.producturl}`,
+        + `- Discount Percentage: ${data.dicountpercentage}%\n\nProduct URL: ${data.producturl}`,
       image: { url: data.image },
     };
      }
