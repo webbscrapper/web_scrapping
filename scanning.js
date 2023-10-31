@@ -1977,9 +1977,7 @@ async function SaveProducts(productData, websiteurl) {
   let price = 0.0;
   var discountpercent  = 0;
   
-  const { format } = require('date-fns');
 
-const formattedDate = format(date, 'dd/MM/yy HH:mm:ss');
 try {
     const snapshott = await db.collection("tokens").get();
 
