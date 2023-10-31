@@ -2115,12 +2115,12 @@ function formatDateTime(date) {
   const d = date.getDate().toString().padStart(2, '0');
   const m = (date.getMonth() + 1).toString().padStart(2, '0');
   const y = date.getFullYear().toString().slice(-2);
-  const ampm = h >= 12 ? 'PM' : 'AM';
   const h = date.getHours().toString().padStart(2, '0');
+  const ampm = h >= 12 ? 'PM' : 'AM';
   const min = date.getMinutes().toString().padStart(2, '0');
   const sec = date.getSeconds().toString().padStart(2, '0');
 
-  return `${d}/${m}/${y} ${hr}:${min}:${sec} ${ampm}`;
+  return `${d}/${m}/${y} ${h}:${min}:${sec} ${ampm}`;
 }
 async function sendMessageToDiscord(dataList, websiteurl) {
   // const botToken = 'MTE2MTE4NzQ3MDIxODYyNTEyNQ.GgtfQA.J95Jzy-RSq05hiYJIA4mfOQ11HDZ0Z5JJT3Jdc';
