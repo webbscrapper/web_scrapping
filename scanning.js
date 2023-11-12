@@ -641,7 +641,7 @@ try {
           dicountpercentage: discountpercent,
 
         });
-        if(discountpercent >= discountpercentagee && newprice > minprice ){
+        if(discountpercent >= discountpercentagee && newprice > minprice && newprice > price){
          
             sendDataInEmail.push({
               image: productData[i].imageurl,
