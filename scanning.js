@@ -609,15 +609,17 @@ try {
       const regExp = new RegExp('[\\d.]+');
 
       // Use the exec method to find the first match in the input string
-      const match = regExp.exec(snapshot.docs[0].data().newprice.toString());
+      const newpriceString = snapshot.docs[0].data().newprice.toString();
+      const match = regExp.exec(newpriceString);
+      newprice = match ? parseFloat(removeFirstDotIfTwo(match[0])) : 0.0;
 
-      newprice = match ? parseFloat(match[0]) : 0.0;
+      const priceString = productData[i].price.toString();
+      const matchPrice = regExp.exec(priceString);
+      price = matchPrice ? parseFloat(removeFirstDotIfTwo(matchPrice[0])) : 0.0;
 
-      const matchPrice = regExp.exec(productData[i].price.toString());
-      price = matchPrice ? parseFloat(matchPrice[0]) : 0.0;
-
-      const matchOldPrice = regExp.exec(snapshot.docs[0].data().oldprice.toString());
-      oldprice = matchOldPrice ? parseFloat(matchOldPrice[0]) : 0.0;
+      const oldpriceString = snapshot.docs[0].data().oldprice.toString();
+      const matchOldPrice = regExp.exec(oldpriceString);
+      oldprice = matchOldPrice ? parseFloat(removeFirstDotIfTwo(matchOldPrice[0])) : 0.0;
 
       console.log('Product Description is: ' + snapshot.docs[0].data().productdescp);
       if (snapshot.docs[0].data().productdescp === productData[i].description &&
@@ -641,6 +643,7 @@ try {
           dicountpercentage: discountpercent,
 
         });
+
         if(discountpercent >= discountpercentagee && newprice > minprice && newprice > price){
          
             sendDataInEmail.push({
@@ -684,6 +687,15 @@ try {
     await sendMessageToDiscord(sendDataInEmail, websiteurl);
     sendDataInEmail.length = 0;
   }
+}
+function removeFirstDotIfTwo(value) {
+  const dotCount = (value.match(/\./g) || []).length;
+
+  if (dotCount === 2) {
+    value = value.replace('.', '');
+  }
+
+  return value;
 }
 function formatDateTime(date) {
   const d = date.getDate().toString().padStart(2, '0');
