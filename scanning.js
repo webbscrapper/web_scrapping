@@ -726,22 +726,24 @@ async function sendMessageToDiscord(dataList, websiteurl) {
      if(data.image == "no image" || data.image == null || data.image == ""){
       embed = {
       title: data.description,
-      description: `- New Price: ${data.newprice}\n`
-        + `- New Price Date: ${data.newpricedate}\n`
-        + `- Old Price: ${data.oldprice}\n`
-        + `- Old Price Date: ${data.oldpricedate}\n`
-        + `- Discount Percentage: ${data.dicountpercentage}%\n\nProduct URL: ${data.producturl}`,
+      description: `- Nuevo precio: ${data.newprice}\n`
+        + `- Fecha nuevo precio: ${data.newpricedate}\n`
+        + `- Precio antigüo: ${data.oldprice}\n`
+        + `- Fecha precio antigüo: ${data.oldpricedate}\n`
+        + `- Porcentaje descuento: ${data.dicountpercentage}%\n`
+        + `- Link: ${data.producturl}`,
       // image: { url: data.image },
     };
 
      }else{
       embed = {
       title: data.description,
-      description: `- New Price: ${data.newprice}\n`
-        + `- New Price Date: ${data.newpricedate}\n`
-        + `- Old Price: ${data.oldprice}\n`
-        + `- Old Price Date: ${data.oldpricedate}\n`
-        + `- Discount Percentage: ${data.dicountpercentage}%\n\nProduct URL: ${data.producturl}`,
+      description: `- Nuevo precio: ${data.newprice}\n`
+        + `- Fecha nuevo precio: ${data.newpricedate}\n`
+        + `- Precio antigüo: ${data.oldprice}\n`
+        + `- Fecha precio antigüo: ${data.oldpricedate}\n`
+        + `- Porcentaje descuento: ${data.dicountpercentage}%\n`
+        + `- Link: ${data.producturl}`,
       image: { url: data.image },
     };
      }
