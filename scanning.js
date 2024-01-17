@@ -47,72 +47,56 @@ setInterval(getWebsiteData, 4 * 60 * 60 * 1000);
 
 
 async function getWebsiteData() {
-var data; 
-if(count == dataArray.length){
-  count = 0;
-  dataArray.length = 0;
-}else{
-  // count = 0;
-  // dataArray.length = 0;
-  return;
-}
+  var data; 
+  if(count == dataArray.length){
+    count = 0;
+    dataArray.length = 0;
+  }else{
+    return;
+  }
 
-try {
-    const snapshott = await db.collection("tokens").get();
-
-    // snapshott.forEach((doc) => {
+  try {
+      const snapshott = await db.collection("tokens").get();
       const tokendata = snapshott.docs[0].data();
       codToke = tokendata['token'];
       minprice = tokendata['minprice'];
       discountpercentagee = tokendata['discountpercentage'];
-      // dataArray.push(data);
-    // });
-
-    // console.log(dataArray); // This will print the array with your Firestore collection data
-
-    // Assuming setWebsiteData is an asynchronous function
-    // await setWebsiteData(dataArray);
+      // Assuming setWebsiteData is an asynchronous function
   } catch (error) {
     console.error('Error getting documents:', error);
   }
 
   try {
     var snapshot = await db.collection("storeurls").get();
-
     snapshot.forEach((doc) => {
-       data = doc.data();
+        data = doc.data();
       websitedata.push(data);
     });
     for (let i = 0; i < websitedata.length; i++) {
-    
       snapshot = await db.collection("storefields").where('storename', '==', websitedata[i].storename).get();
       if(snapshot.empty){
 
       }else{
-        // snapshot.forEach((doc) => {
-          // data = doc.data();
-          dataArray.push({
-            parentdivclass: snapshot.docs[0].data().parentdivclass,
-            producturlclass:  snapshot.docs[0].data().producturlclass,
-            url:  websitedata[i].categoryurl,
-            imgclass:  snapshot.docs[0].data().imgclass,
-            descpclass: snapshot.docs[0].data().descpclass,
-            currclass: snapshot.docs[0].data().currclass,
-            priceclass: snapshot.docs[0].data().priceclass,
-            paginationpageclass: snapshot.docs[0].data().paginationpageclass,
-            paginationurltxt: snapshot.docs[0].data().paginationurltxt,
-            paginationurlvalue: snapshot.docs[0].data().paginationurlvalue,
-          });
-        // });
+       
+        dataArray.push({
+          parentdivclass: snapshot.docs[0].data().parentdivclass,
+          producturlclass:  snapshot.docs[0].data().producturlclass,
+          url:  websitedata[i].categoryurl,
+          imgclass:  snapshot.docs[0].data().imgclass,
+          descpclass: snapshot.docs[0].data().descpclass,
+          currclass: snapshot.docs[0].data().currclass,
+          priceclass: snapshot.docs[0].data().priceclass,
+          paginationpageclass: snapshot.docs[0].data().paginationpageclass,
+          paginationurltxt: snapshot.docs[0].data().paginationurltxt,
+          paginationurlvalue: snapshot.docs[0].data().paginationurlvalue,
+        });
       }
-    
     }
     console.log(dataArray); // This will print the array with your Firestore collection data
-
     // Assuming setWebsiteData is an asynchronous function
     if(dataArray.length>0){
       await setWebsiteData(dataArray);
- 
+
     }else{
       console.log("No store data available");
     }
@@ -120,6 +104,7 @@ try {
     console.error('Error getting documents:', error);
   }
 }
+
 async function setWebsiteData(addingUrlData) {
   console.log("Added Data Displayed:" + addingUrlData[0]['url'].toString());
   realUrl = addingUrlData[0]['url'].toString();
@@ -147,68 +132,48 @@ async function setWebsiteData(addingUrlData) {
 
   }
 }
-// const db = admin.firestore();
-// const data = {
-//   name: 'John Doe',
-//   email: 'johndoe@example.com',
-//   age: 30
-// };  
-// const docRef = db.collection('products').add(data)
-//   .then(docRef => {
-//     console.log('Document written with ID: ', docRef.id);
-//   })
-//   .catch(error => {
-//     console.error('Error adding document: ', error);
-//   });
 
 // Add a new document with a generated ID to a collection
 async function scrapeWebsiteUrl(parentdivclass,producturlclass,urls,imgclass,descpclass,currclass,priceclass,paginationpageclass,paginationurltxt,paginationurlvalue) {
-   console.log('Received a POST request to /v1/sendbotdata');
-  // console.log(req.body); // Log the request body
+  console.log('Received a POST request to /v1/sendbotdata');
   const data = [];
+  const browser = await puppeteer.launch({
+    args:[
+    "--disable-setuid-sandbox",
+    "--no-sandbox",
+    "--single-process",
+    "--no-zygote", 
+    ], 
+    executablePath: process.env.NODE_ENV === "production" 
+    ? process.env.PUPPETEER_EXECUTABLE_PATH
+    :puppeteer.executablePath(),
+    headless: true,
+    timeout: 0 
+  });
 
-const browser = await puppeteer.launch({
-      args:[
-      "--disable-setuid-sandbox",
-      "--no-sandbox",
-      "--single-process",
-      "--no-zygote", 
-      ], 
-      executablePath: process.env.NODE_ENV === "production" 
-      ? process.env.PUPPETEER_EXECUTABLE_PATH
-      :puppeteer.executablePath(),
-      headless: true,
-      timeout: 0 });
   try {
-    
     var page = await browser.newPage();
     const url = urls;
     var paginurltxt;
     var paginurlval = paginationurlvalue;
 
-
     if (!url || typeof url !== 'string') {
       throw new Error('Invalid URL provided.');
     }
+
     if(paginationurltxt != "" && paginationurltxt != null){
      paginurltxt = paginationurltxt;
     }
-    
 
-  
     await page.goto(url, { timeout: 0, waitUntil: 'domcontentloaded' });
     await page.setRequestInterception(false);
     var paginationElements;
 
     // Check if pagination elements exist
     if(!paginationpageclass || paginationpageclass.length === 0){
-     
-
     }else{
      paginationElements = await page.$$(paginationpageclass);
-  
     }
-    // const paginationElements = await page.$$(req.body.paginationclass);
 
     if (paginationpageclass == "") {
       // No pagination elements found, scrape data from a single page
@@ -252,294 +217,167 @@ const browser = await puppeteer.launch({
       let pageCounter = 1;
       let datacount = 0;
 
-
       while (true) {
-        
         currentPageURL = url+paginurltxt+pageCounter;
         console.log(currentPageURL);
         await page.close();
-         page = await browser.newPage();
+        page = await browser.newPage();
         try {
-             try{
-               await page.goto(currentPageURL, { timeout: 0, waitUntil: 'domcontentloaded' });
-              
-             }catch(e){
-              console.log("Frame Error not working");
-              continue;
-             }
-             
-            } catch (error) {
-            
-              console.error('Error navigating to page:', error);
-            
-            }
-          await page.waitForTimeout(8000);
-          if(imgclass == null || imgclass == ""){
-            break;
+          try{
+            await page.goto(currentPageURL, { timeout: 0, waitUntil: 'domcontentloaded' });
+          }catch(e){
+            console.log("Frame Error not working");
+            continue;
           }
-          const imgSelector = imgclass; // Replace with the selector for the <img> element
-    // await page.waitForSelector(imgSelector);
-    const checknextpagedata = await page.$$(descpclass);
-    if(checknextpagedata.length == 0 || checknextpagedata == null ){
-      datacount+=1;
-
-      console.log('Images selectors not found on the next page. Stopping program.');
-      if(datacount>=3){
-        break; // Exit the loop
-        
-      }
-      continue;
-    }
-    datacount = 0;
-
-
-    const imgElem = await page.waitForSelector(imgSelector); // Adjust the timeout as needed
-
-    if (!imgElem) {
-      await page.waitForTimeout(8000); 
-      if (!imgElem) {
-        console.log('Data not found on the next page. Stopping program.');
-        break; // Exit the loop
-      } 
-    }
-
-    // Add an event listener to the <img> element to check for the 'load' event
-    await page.evaluate((selector) => {
-      const imgElement = document.querySelector(selector);
-       new Promise((resolve) => {
-        imgElement.addEventListener('load', resolve);
-      });
-    }, imgclass);
-         // await page.waitForSelector(req.body.imgclass);
-//          await page.evaluate(() => {
-//            window.scrollTo(0, document.body.scrollHeight);
-//          });
-//          await page.waitForTimeout(10000);
-
-
-//         // Your scraping logic here
-//        await page.evaluate(() => {
-//   window.scrollTo(0, document.body.scrollHeight);
-// });
-const scrollStep = 280; // The number of pixels to scroll in each step
-const scrollInterval = 1000; // The time interval (in milliseconds) between each step
-var imageUrl = "";
-// await page.waitForTimeout(5000); 
- const maxScrollHeight = await page.evaluate(() => document.body.scrollHeight);
-  let currentScrollHeight = 0;
-
-  while (currentScrollHeight < maxScrollHeight) {
-    await page.evaluate((scrollStep) => {
-      window.scrollBy(0, scrollStep);
-    }, scrollStep);
-
-    await page.waitForTimeout(scrollInterval);
-    currentScrollHeight += scrollStep;
-  }
-// const imageUrls =await page.$$eval(imgclass, images => images.map(img => img.src));
-// Collect image URLs
-await page.waitForTimeout(5000); 
-await page.waitForSelector(imgclass);
-const imageUrlss = await page.$$eval(imgclass, (images) => {
-  return images.map((img) => img.getAttribute('src'));
-});
-
-        // const descp = await page.$$(descpclass);
-        // const curr = await page.$$(currclass);
-        // const elements = await page.$$(priceclass);
-        // const nextpage = await page.$$(priceclass);
-//         const [descp, curr, elements, nextpage] = await Promise.all([
-//   page.$$(descpclass),
-//   page.$$(currclass+':first-child'),
-//   page.$$(priceclass+':first-child'), 
-//   page.$$(priceclass+':first-child'),  // I assume you meant "nextpageclass" here
-
-// ]);
-// const parentDivClass = ".tw-flex-col.tw-p-0px"; // Replace with the actual class name of the parent div
-
-const parentElements = await page.$$(parentdivclass);
-console.log(parentdivclass);
-console.log("Parent Element Length: "+parentElements.length.toString());
-
-var desc = [];
-var imageUrls = [];
-var price = [];
-var prodUrl = "";
-for (const parentElement of parentElements) {
-  const descElements = await parentElement.$$(descpclass);
-  const imageElements = await parentElement.$$(imgclass);
-  const priceElements = await parentElement.$$(priceclass);
-  const productElements = await parentElement.$$(producturlclass);
-   
-   console.log("Descp Length: "+descElements.length);
-   console.log("Product Length: "+productElements.length);
-   console.log("Image Length: "+imageElements.length);
-   console.log("Price Length: "+priceElements.length);
-   console.log("Peoduct Url Class: "+producturlclass);
- 
-  // console.log("Image Details:"+imageElements.toString());
-  // console.log("Length of Desc:"+descElements.length.toString() );
-  // console.log("Length of Image:"+imageElements.length.toString() );
-  // console.log("Length of Price:"+priceElements.length.toString() );
- 
-    
-  if (descElements.length > 0 && imageElements.length > 0 && priceElements.length > 0 ) {
-    const descText = await descElements[0].evaluate(element => element.textContent);
-    if(productElements.length >0){
-        prodUrl = await productElements[0].evaluate(element => element.getAttribute('href'));
-        if(prodUrl.includes("https")){
-
-        }else{
-          prodUrl = realUrl+prodUrl;
+        } catch (error) {
+          console.error('Error navigating to page:', error);
         }
-        
-      }else{
-          prodUrl = "no product url";
-        
-      }
-    const imageUrl = await imageElements[0].evaluate(element => element.getAttribute('src'));
-    const priceText = await priceElements[0].evaluate(element => element.textContent);
 
-      // console.log({
-      //       'description': descText,
-      //       'imageurl': imageUrl,
-      //       'price': priceText,
-      //       'currency': priceText,
-      //       'websiteurl':currentPageURL
-      //     });
-      console.log("Data Pushed");
+        await page.waitForTimeout(8000);
+        if(imgclass == null || imgclass == ""){
+          break;
+        }
+        const imgSelector = imgclass; // Replace with the selector for the <img> element
+        const checknextpagedata = await page.$$(descpclass);
 
-          data.push({
-            'description': descText,
-            'producturl':prodUrl,
-            'imageurl': imageUrl,
-            'price': priceText,
-            'currency': priceText,
-            'websiteurl':currentPageURL
+        if(checknextpagedata.length == 0 || checknextpagedata == null ){
+          datacount+=1;
+
+          console.log('Images selectors not found on the next page. Stopping program.');
+          if(datacount>=3){
+            break; // Exit the loop
+            
+          }
+          continue;
+        }
+        datacount = 0;
+        const imgElem = await page.waitForSelector(imgSelector); // Adjust the timeout as needed
+
+        if (!imgElem) {
+          await page.waitForTimeout(8000); 
+          if (!imgElem) {
+            console.log('Data not found on the next page. Stopping program.');
+            break; // Exit the loop
+          } 
+        }
+
+        // Add an event listener to the <img> element to check for the 'load' event
+        await page.evaluate((selector) => {
+          const imgElement = document.querySelector(selector);
+          new Promise((resolve) => {
+            imgElement.addEventListener('load', resolve);
           });
-  } else {
+        }, imgclass);
 
-    if(descElements.length > 0 && priceElements.length > 0 ){
+        const scrollStep = 280; // The number of pixels to scroll in each step
+        const scrollInterval = 1000; // The time interval (in milliseconds) between each step
+        var imageUrl = "";
+        const maxScrollHeight = await page.evaluate(() => document.body.scrollHeight);
+        let currentScrollHeight = 0;
 
-      const descText = await descElements[0].evaluate(element => element.textContent);
-      if(productElements.length >0){
-        prodUrl = await productElements[0].evaluate(element => element.getAttribute('href'));
-        
-      }else{
-          prodUrl = "no product url";
-        
-      }
-      const imageUrl = "no image";
-      const priceText = await priceElements[0].evaluate(element => element.textContent);
+        while (currentScrollHeight < maxScrollHeight) {
+          await page.evaluate((scrollStep) => {
+            window.scrollBy(0, scrollStep);
+          }, scrollStep);
+
+          await page.waitForTimeout(scrollInterval);
+          currentScrollHeight += scrollStep;
+        }
+
+        // Collect image URLs
+        await page.waitForTimeout(5000); 
+        await page.waitForSelector(imgclass);
+        const imageUrlss = await page.$$eval(imgclass, (images) => {
+          return images.map((img) => img.getAttribute('src'));
+        });
+
+        const parentElements = await page.$$(parentdivclass);
+        console.log(parentdivclass);
+        console.log("Parent Element Length: "+parentElements.length.toString());
+
+        var desc = [];
+        var imageUrls = [];
+        var price = [];
+        var prodUrl = "";
+
+        for (const parentElement of parentElements) {
+          const descElements = await parentElement.$$(descpclass);
+          const imageElements = await parentElement.$$(imgclass);
+          const priceElements = await parentElement.$$(priceclass);
+          const productElements = await parentElement.$$(producturlclass);
           
-          // console.log({
-          //   'description': descText,
-          //   'imageurl': imageUrl,
-          //   'price': priceText,
-          //   'currency': priceText,
-          //   'websiteurl':currentPageURL
-          // });
-          console.log("Data Pushed");
+          console.log("Descp Length: "+descElements.length);
+          console.log("Product Length: "+productElements.length);
+          console.log("Image Length: "+imageElements.length);
+          console.log("Price Length: "+priceElements.length);
+          console.log("Peoduct Url Class: "+producturlclass);
+            
+          if (descElements.length > 0 && imageElements.length > 0 && priceElements.length > 0 ) {
+            const descText = await descElements[0].evaluate(element => element.textContent);
+            if(productElements.length >0){
+              prodUrl = await productElements[0].evaluate(element => element.getAttribute('href'));
+              if(prodUrl.includes("https")){
 
-          data.push({
-            'description': descText,
-            'producturl':prodUrl,
-            'imageurl': imageUrl,
-            'price': priceText,
-            'currency': priceText,
-            'websiteurl':currentPageURL
-          });
-    }
-    console.log("Data is missing for a specific instance.");
-  }
-}
+              }else{
+                prodUrl = realUrl+prodUrl;
+              }
+              
+            }else{
+                prodUrl = "no product url";
+              
+            }
 
-         // console.log("imageUrls: "+imageUrls.length);
-         // console.log("Descp: "+descp.length);
-         // console.log("Currency: "+curr.length);
-         // console.log("price: "+elements.length);
-         //  console.log("price: "+nextpage.length);
-         //  console.log(imageUrls);
+            const imageUrl = await imageElements[0].evaluate(element => element.getAttribute('src'));
+            const priceText = await priceElements[0].evaluate(element => element.textContent);
+            console.log("Data Pushed");
 
-        // for (let i = 0; i < descp.length; i++) {
-          
-        //   // if (imageUrls[i].includes(',')) {
+            data.push({
+              'description': descText,
+              'producturl':prodUrl,
+              'imageurl': imageUrl,
+              'price': priceText,
+              'currency': priceText,
+              'websiteurl':currentPageURL
+            });
+          } else {
+            if(descElements.length > 0 && priceElements.length > 0 ){
+              const descText = await descElements[0].evaluate(element => element.textContent);
+              if(productElements.length >0){
+                prodUrl = await productElements[0].evaluate(element => element.getAttribute('href'));
+              }else{
+                  prodUrl = "no product url";
+                
+              }
+              const imageUrl = "no image";
+              const priceText = await priceElements[0].evaluate(element => element.textContent);
+              console.log("Data Pushed");
 
-
-        //   //    // The string contains a comma, so we split and trim it
-        //   //    console.log(imageUrls[i]);
-        //   //    const urlList = imageUrls[i].split(',').map(url => url.trim());
-
-        //   //    imageUrls[i] = urlList[1];
-        //   // } else {
-        //   //   // The string doesn't contain a comma, so it's a single URL
-        //   //   console.log('Only one URL found:');
-        //   //  // imageUrl = imageUrls[i];
-        //   // }
-
-        //   const desc = await descp[i].evaluate((element) => element.textContent);
-        //   const price = await elements[i].evaluate((element) => element.textContent);
-        //   const currency = await curr[i].evaluate((element) => element.textContent);
-
-        //   // if (!priceElement || !currencyElement || !description) {
-        //   //   console.log(`Skipping index ${i} due to missing elements.`);
-        //   //   continue;
-        //   // }
-
-        //   // const priceProperty = await priceElement.getProperty('textContent');
-        //   // const currencyProperty = await currencyElement.getProperty('textContent');
-        //   // const descriptionProperty = await description.getProperty('textContent');
-
-        //   // const desc = await descriptionProperty.jsonValue();
-        //   // const price = await priceProperty.jsonValue();
-        //   // const currency = await currencyProperty.jsonValue();
-        //   console.log({
-        //     'description': desc,
-        //     'imageurl': imageUrls[i],
-        //     'price': price,
-        //     'currency': currency,
-        //     'websiteurl':currentPageURL
-        //   });
-
-        //   data.push({
-        //     'description': desc,
-        //     'imageurl': imageUrls[i],
-        //     'price': price,
-        //     'currency': currency,
-        //     'websiteurl':currentPageURL
-        //   });
-        // }
-
+              data.push({
+                'description': descText,
+                'producturl':prodUrl,
+                'imageurl': imageUrl,
+                'price': priceText,
+                'currency': priceText,
+                'websiteurl':currentPageURL
+              });
+            }
+            console.log("Data is missing for a specific instance.");
+          }
+        }
         // Check if there are no more pages to scrape
         const hasNextPage = await page.$(paginationpageclass);
-        // if (!hasNextPage || hasNextPage == "" || hasNextPage == null || imageUrls.length == 0 ) {
-        //   break;
-        // }
         console.log("I run");
         console.log("Data Length:"+data.length.toString());
-
         pageCounter+=paginurlval;
-        
       }
     }
-
-
     await page.close(); // Close the page
     await browser.close();
     await SaveProducts(data,currentPageURL);    
-    // res.status(200).json({
-    //   'status_code': 200,
-    //   'data': data,
-    // });
   } catch (error) {
     console.log("Something is going wrong");
     console.error(error);
     await SaveProducts(data,currentPageURL);
-    // res.status(500).json({
-    //   'status_code': 500,
-    //   'error': 'Internal server error',
-    //   'data':data,
-    // });
   } finally {
     await browser.close();
   }
@@ -553,99 +391,79 @@ async function SaveProducts(productData, websiteurl) {
   let price = 0.0;
   var discountpercent  = 0;
   
-
-try {
+  try {
     const snapshott = await db.collection("tokens").get();
-
-    // snapshott.forEach((doc) => {
-      const tokendata = snapshott.docs[0].data();
-      codToke = tokendata['token'];
-      minprice = tokendata['minprice'];
-      discountpercentagee = tokendata['discountpercentage'];
-
-      // dataArray.push(data);
-    // });
-
-    // console.log(dataArray); // This will print the array with your Firestore collection data
-
+    const tokendata = snapshott.docs[0].data();
+    codToke = tokendata['token'];
+    minprice = tokendata['minprice'];
+    discountpercentagee = tokendata['discountpercentage'];
     // Assuming setWebsiteData is an asynchronous function
     // await setWebsiteData(dataArray);
   } catch (error) {
     console.error('Error getting token:', error);
   }
-  // console.log('Product Data: ' + JSON.stringify(productData));
   console.log('Save product data length: ' + productData.length.toString());
 
   for (let i = 0; i < productData.length; i++) {
     console.log('Firestore Index: ' + i);
     setTimeout(() => {
-    
     }, 2000);
 
-   try{
-    const snapshot = await db.collection('products')
+    try{
+      const snapshot = await db.collection('products')
       .where('productdescp', '==', productData[i].description)
       .get();
+      console.log('Date is saving in Firestore');
 
-    console.log('Date is saving in Firestore');
-
-    if (snapshot.empty) {
-      console.log('No Data found');
-      const newProductRef = await db.collection('products').add({
-        imageurl:productData[i].imageurl,
-        productdescp: productData[i].description,
-        producturl:productData[i].producturl,
-        oldprice: productData[i].price.toString(),
-        oldpricedate: new Date(),
-        newprice: productData[i].price.toString(),
-        newpricedate: new Date(),
-        productcurrency: productData[i].currency,
-        websiteurl: productData[i].websiteurl,
-      });
-
-      console.log('Data added with ID: ', newProductRef.id);
-    } else {
-      console.log('I am here in matching prices');
-      const regExp = new RegExp('[\\d.]+');
-
-      // Use the exec method to find the first match in the input string
-      const newpriceString = snapshot.docs[0].data().newprice.toString();
-      const match = regExp.exec(newpriceString);
-      newprice = match ? parseFloat(removeFirstDotIfTwo(match[0])) : 0.0;
-
-      const priceString = productData[i].price.toString();
-      const matchPrice = regExp.exec(priceString);
-      price = matchPrice ? parseFloat(removeFirstDotIfTwo(matchPrice[0])) : 0.0;
-
-      const oldpriceString = snapshot.docs[0].data().oldprice.toString();
-      const matchOldPrice = regExp.exec(oldpriceString);
-      oldprice = matchOldPrice ? parseFloat(removeFirstDotIfTwo(matchOldPrice[0])) : 0.0;
-
-      console.log('Product Description is: ' + snapshot.docs[0].data().productdescp);
-      if (snapshot.docs[0].data().productdescp === productData[i].description &&
-        newprice !== 0 &&
-        newprice !== price
-      ) {
-        console.log('New Price changed');
-        discountprice = newprice - price;
-        // if (discountprice < 0) {
-        //   discountprice = -discountprice;
-        // }
-
-        discountpercent = parseInt((discountprice / newprice) * 100);
-        console.log('Id of Product: ' + snapshot.docs[0].id);
-
-        await db.collection('products').doc(snapshot.docs[0].id).update({
-          oldprice: snapshot.docs[0].data().newprice.toString(),
-          oldpricedate: snapshot.docs[0].data().newpricedate.toDate(),
+      if (snapshot.empty) {
+        console.log('No Data found');
+        const newProductRef = await db.collection('products').add({
+          imageurl:productData[i].imageurl,
+          productdescp: productData[i].description,
+          producturl:productData[i].producturl,
+          oldprice: productData[i].price.toString(),
+          oldpricedate: new Date(),
           newprice: productData[i].price.toString(),
           newpricedate: new Date(),
-          dicountpercentage: discountpercent,
-
+          productcurrency: productData[i].currency,
+          websiteurl: productData[i].websiteurl,
         });
 
-        if(discountpercent >= discountpercentagee && newprice > minprice && newprice > price){
-         
+        console.log('Data added with ID: ', newProductRef.id);
+      } else {
+        console.log('I am here in matching prices');
+        const regExp = new RegExp('[\\d.]+');
+
+        // Use the exec method to find the first match in the input string
+        const newpriceString = snapshot.docs[0].data().newprice.toString();
+        const match = regExp.exec(newpriceString);
+        newprice = match ? parseFloat(removeFirstDotIfTwo(match[0])) : 0.0;
+
+        const priceString = productData[i].price.toString();
+        const matchPrice = regExp.exec(priceString);
+        price = matchPrice ? parseFloat(removeFirstDotIfTwo(matchPrice[0])) : 0.0;
+
+        const oldpriceString = snapshot.docs[0].data().oldprice.toString();
+        const matchOldPrice = regExp.exec(oldpriceString);
+        oldprice = matchOldPrice ? parseFloat(removeFirstDotIfTwo(matchOldPrice[0])) : 0.0;
+
+        console.log('Product Description is: ' + snapshot.docs[0].data().productdescp);
+        if (snapshot.docs[0].data().productdescp === productData[i].description && newprice !== 0 && newprice !== price){
+          console.log('New Price changed');
+          discountprice = newprice - price;
+          discountpercent = parseInt((discountprice / newprice) * 100);
+          console.log('Id of Product: ' + snapshot.docs[0].id);
+
+          await db.collection('products').doc(snapshot.docs[0].id).update({
+            oldprice: snapshot.docs[0].data().newprice.toString(),
+            oldpricedate: snapshot.docs[0].data().newpricedate.toDate(),
+            newprice: productData[i].price.toString(),
+            newpricedate: new Date(),
+            dicountpercentage: discountpercent,
+
+          });
+
+          if(discountpercent >= discountpercentagee && newprice > minprice && newprice > price){
             sendDataInEmail.push({
               image: productData[i].imageurl,
               description: productData[i].description,
@@ -657,26 +475,23 @@ try {
               dicountpercentage: discountpercent,
               websiteurl: productData[i].websiteurl,
             });  
+          }
+        } else {
+          console.log('No data changed');
         }
-
-        
-      } else {
-        console.log('No data changed');
       }
-    }
 
-    if (sendDataInEmail.length >= 15) {
-      console.log('Send Data Length Is High');
-      // Call your email sending function or Discord message sending function here.
-      // await sendEmail(sendDataInEmail, websiteurl);
-       countDiscountMessage = 0;
-      await sendMessageToDiscord(sendDataInEmail, websiteurl);
-      sendDataInEmail.length = 0;
+      if (sendDataInEmail.length >= 15) {
+        console.log('Send Data Length Is High');
+        // Call your email sending function or Discord message sending function here.
+        // await sendEmail(sendDataInEmail, websiteurl);
+        countDiscountMessage = 0;
+        await sendMessageToDiscord(sendDataInEmail, websiteurl);
+        sendDataInEmail.length = 0;
+      }
+    }catch (error) {
+      console.error('Error From Firestore:', error);
     }
-  }catch (error) {
-    console.error('Error From Firestore:', error);
-  }
-  
   }
 
   if (sendDataInEmail.length > 0 && sendDataInEmail.length < 15) {
@@ -688,6 +503,7 @@ try {
     sendDataInEmail.length = 0;
   }
 }
+
 function removeFirstDotIfTwo(value) {
   const dotCount = (value.match(/\./g) || []).length;
 
@@ -697,6 +513,7 @@ function removeFirstDotIfTwo(value) {
 
   return value;
 }
+
 function formatDateTime(date) {
   const d = date.getDate().toString().padStart(2, '0');
   const m = (date.getMonth() + 1).toString().padStart(2, '0');
@@ -708,6 +525,7 @@ function formatDateTime(date) {
 
   return `${d}/${m}/${y} ${h}:${min}:${sec} ${ampm}`;
 }
+
 async function sendMessageToDiscord(dataList, websiteurl) {
   // const botToken = 'MTE2MTE4NzQ3MDIxODYyNTEyNQ.GgtfQA.J95Jzy-RSq05hiYJIA4mfOQ11HDZ0Z5JJT3Jdc';
   const botToken = codToke;
@@ -726,24 +544,22 @@ async function sendMessageToDiscord(dataList, websiteurl) {
      if(data.image == "no image" || data.image == null || data.image == ""){
       embed = {
       title: data.description,
-      description: `- Nuevo precio: ${data.newprice}\n`
-        + `- Fecha nuevo precio: ${data.newpricedate}\n`
-        + `- Precio antigüo: ${data.oldprice}\n`
-        + `- Fecha precio antigüo: ${data.oldpricedate}\n`
-        + `- Porcentaje descuento: ${data.dicountpercentage}%\n`
-        + `- Link: ${data.producturl}`,
+      description: `- New Price: ${data.newprice}\n`
+        + `- New Price Date: ${data.newpricedate}\n`
+        + `- Old Price: ${data.oldprice}\n`
+        + `- Old Price Date: ${data.oldpricedate}\n`
+        + `- Discount Percentage: ${data.dicountpercentage}%\n\nProduct URL: ${data.producturl}`,
       // image: { url: data.image },
     };
 
      }else{
       embed = {
       title: data.description,
-      description: `- Nuevo precio: ${data.newprice}\n`
-        + `- Fecha nuevo precio: ${data.newpricedate}\n`
-        + `- Precio antigüo: ${data.oldprice}\n`
-        + `- Fecha precio antigüo: ${data.oldpricedate}\n`
-        + `- Porcentaje descuento: ${data.dicountpercentage}%\n`
-        + `- Link: ${data.producturl}`,
+      description: `- New Price: ${data.newprice}\n`
+        + `- New Price Date: ${data.newpricedate}\n`
+        + `- Old Price: ${data.oldprice}\n`
+        + `- Old Price Date: ${data.oldpricedate}\n`
+        + `- Discount Percentage: ${data.dicountpercentage}%\n\nProduct URL: ${data.producturl}`,
       image: { url: data.image },
     };
      }
@@ -780,41 +596,3 @@ async function sendMessageToDiscord(dataList, websiteurl) {
     }
   }
 }
-
-
-// app.post('/v1/sendbotdata', async (req, res) => {
- 
-// });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
