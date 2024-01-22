@@ -56,8 +56,8 @@ async function getWebsiteData() {
   }
 
   try {
-      const snapshott = await db.collection("tokens").get();
-      const tokendata = snapshott.docs[0].data();
+      const snapshot = await db.collection("tokens").get();
+      const tokendata = snapshot.docs[0].data();
       codToke = tokendata['token'];
       minprice = tokendata['minprice'];
       discountpercentagee = tokendata['discountpercentage'];
@@ -111,25 +111,24 @@ async function setWebsiteData(addingUrlData) {
 
   for (let i = 0; i < addingUrlData.length; i++) {
     try{
-   realUrl = addingUrlData[i]['url'].toString();
-    // You can add any necessary logic here, similar to the Dart code.
-   count+=1;
-    await scrapeWebsiteUrl(
-      addingUrlData[i]['parentdivclass'].toString(),
-      addingUrlData[i]['producturlclass'].toString(),
-      addingUrlData[i]['url'].toString(),
-      addingUrlData[i]['imgclass'].toString(),
-      addingUrlData[i]['descpclass'].toString(),
-      addingUrlData[i]['currclass'].toString(),
-      addingUrlData[i]['priceclass'].toString(),
-      addingUrlData[i]['paginationpageclass'].toString(),
-      addingUrlData[i]['paginationurltxt'].toString(),
-      parseInt(addingUrlData[i]['paginationurlvalue'].toString())
-    );
-  }catch (error) {
-    console.error('Error in Website Urls Fields:', error);
-  }
-
+      realUrl = addingUrlData[i]['url'].toString();
+        // You can add any necessary logic here, similar to the Dart code.
+      count+=1;
+      await scrapeWebsiteUrl(
+        addingUrlData[i]['parentdivclass'].toString(),
+        addingUrlData[i]['producturlclass'].toString(),
+        addingUrlData[i]['url'].toString(),
+        addingUrlData[i]['imgclass'].toString(),
+        addingUrlData[i]['descpclass'].toString(),
+        addingUrlData[i]['currclass'].toString(),
+        addingUrlData[i]['priceclass'].toString(),
+        addingUrlData[i]['paginationpageclass'].toString(),
+        addingUrlData[i]['paginationurltxt'].toString(),
+        parseInt(addingUrlData[i]['paginationurlvalue'].toString())
+      );
+    }catch (error) {
+      console.error('Error in Website Urls Fields:', error);
+    }
   }
 }
 
@@ -392,8 +391,8 @@ async function SaveProducts(productData, websiteurl) {
   var discountpercent  = 0;
   
   try {
-    const snapshott = await db.collection("tokens").get();
-    const tokendata = snapshott.docs[0].data();
+    const snapshot = await db.collection("tokens").get();
+    const tokendata = snapshot.docs[0].data();
     codToke = tokendata['token'];
     minprice = tokendata['minprice'];
     discountpercentagee = tokendata['discountpercentage'];
@@ -454,27 +453,29 @@ async function SaveProducts(productData, websiteurl) {
           discountpercent = parseInt((discountprice / newprice) * 100);
           console.log('Id of Product: ' + snapshot.docs[0].id);
 
-          await db.collection('products').doc(snapshot.docs[0].id).update({
-            oldprice: snapshot.docs[0].data().newprice.toString(),
-            oldpricedate: snapshot.docs[0].data().newpricedate.toDate(),
-            newprice: productData[i].price.toString(),
-            newpricedate: new Date(),
-            dicountpercentage: discountpercent,
+          if(discountpercent > 40){
+            await db.collection('products').doc(snapshot.docs[0].id).update({
+              oldprice: snapshot.docs[0].data().newprice.toString(),
+              oldpricedate: snapshot.docs[0].data().newpricedate.toDate(),
+              newprice: productData[i].price.toString(),
+              newpricedate: new Date(),
+              discountpercentage: discountpercent,
 
-          });
+            });
 
-          if(discountpercent >= discountpercentagee && newprice > minprice && newprice > price){
-            sendDataInEmail.push({
-              image: productData[i].imageurl,
-              description: productData[i].description,
-              producturl:productData[i].producturl,
-              oldprice: snapshot.docs[0].data().newprice,
-              oldpricedate:formatDateTime(snapshot.docs[0].data().newpricedate.toDate()),
-              newprice: productData[i].price,
-              newpricedate:formatDateTime(new Date()),
-              dicountpercentage: discountpercent,
-              websiteurl: productData[i].websiteurl,
-            });  
+            if(discountpercent >= discountpercentagee && newprice > minprice && newprice > price){
+              sendDataInEmail.push({
+                image: productData[i].imageurl,
+                description: productData[i].description,
+                producturl:productData[i].producturl,
+                oldprice: snapshot.docs[0].data().newprice,
+                oldpricedate:formatDateTime(snapshot.docs[0].data().newpricedate.toDate()),
+                newprice: productData[i].price,
+                newpricedate:formatDateTime(new Date()),
+                discountpercentage: discountpercent,
+                websiteurl: productData[i].websiteurl,
+              });  
+            }
           }
         } else {
           console.log('No data changed');
@@ -544,22 +545,24 @@ async function sendMessageToDiscord(dataList, websiteurl) {
      if(data.image == "no image" || data.image == null || data.image == ""){
       embed = {
       title: data.description,
-      description: `- New Price: ${data.newprice}\n`
-        + `- New Price Date: ${data.newpricedate}\n`
-        + `- Old Price: ${data.oldprice}\n`
-        + `- Old Price Date: ${data.oldpricedate}\n`
-        + `- Discount Percentage: ${data.dicountpercentage}%\n\nProduct URL: ${data.producturl}`,
+      description: `- Nuevo Precio: ${data.newprice}\n`
+        + `- Fecha Nuevo Precio: ${data.newpricedate}\n`
+        + `- Precio Antigüo: ${data.oldprice}\n`
+        + `- Fecha Antigüo Precio: ${data.oldpricedate}\n`
+        + `- Porcentaje de descuento: ${data.discountpercentage}%\n`
+        + `- Product URL: ${data.producturl}`,
       // image: { url: data.image },
     };
 
      }else{
       embed = {
       title: data.description,
-      description: `- New Price: ${data.newprice}\n`
-        + `- New Price Date: ${data.newpricedate}\n`
-        + `- Old Price: ${data.oldprice}\n`
-        + `- Old Price Date: ${data.oldpricedate}\n`
-        + `- Discount Percentage: ${data.dicountpercentage}%\n\nProduct URL: ${data.producturl}`,
+      description: `- Nuevo Precio: ${data.newprice}\n`
+        + `- Fecha Nuevo Precio: ${data.newpricedate}\n`
+        + `- Precio Antigüo: ${data.oldprice}\n`
+        + `- Fecha Antigüo Precio: ${data.oldpricedate}\n`
+        + `- Porcentaje de descuento: ${data.discountpercentage}%\n`
+        + `- Product URL: ${data.producturl}`,
       image: { url: data.image },
     };
      }
