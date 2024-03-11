@@ -574,7 +574,7 @@ async function sendMessageToDiscord(dataList, websiteurl) {
     embeds,
   };
 
-   try {
+  try {
      const response = await axios.post(apiUrl, messageData, { headers });
 
     if (response.status === 200) {
